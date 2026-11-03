@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block title %}Analyzer{% endblock %}
+{% block content %}
+<h1>Job description analyzer</h1>
+<p class="muted">Paste any job posting to see how well your resume matches, without saving it as an application.</p>
+
+{% if not resume %}
+  <div class="flash flash-error">You haven't uploaded a resume yet. <a href="{{ url_for('views.resume') }}">Upload one</a> to use the analyzer.</div>
+{% endif %}
+
+<form method="post" class="card form">
+  <label>Job description
+    <textarea name="job_description" rows="10" required>{{ job_description }}</textarea>
+  </label>
+  <div class="form-actions"><button class="btn" type="submit">Analyse match</button></div>
+</form>
+
+{% if analysis %}{% include "_analysis.html" %}{% endif %}
+{% endblock %}

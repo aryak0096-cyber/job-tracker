@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block title %}{{ 'Edit' if editing else 'New' }} application{% endblock %}
+{% block content %}
+<h1>{{ 'Edit application' if editing else 'Add application' }}</h1>
+
+<form method="post" class="card form">
+  <div class="grid-2">
+    <label>Company *
+      <input name="company" value="{{ form.get('company', '') }}" required maxlength="120">
+      {% if errors.company %}<span class="field-error">{{ errors.company }}</span>{% endif %}
+    </label>
+    <label>Role *
+      <input name="role" value="{{ form.get('role', '') }}" required maxlength="120">
+      {% if errors.role %}<span class="field-error">{{ errors.role }}</span>{% endif %}
+    </label>
+    <label>Status
+      <select name="status">
+        {% for s in statuses %}<option value="{{ s }}" {% if s == form.get('status', 'Applied') %}selected{% endif %}>{{ s }}</option>{% endfor %}
+      </select>
+      {% if errors.status %}<span class="field-error">{{ errors.status }}</span>{% endif %}
+    </label>
+    <label>Date applied
+      <input type="date" name="applied_date" value="{{ form.get('applied_date', '') }}">
+      {% if errors.applied_date %}<span class="field-error">{{ errors.applied_date }}</span>{% endif %}
+    </label>
+  </div>
+
+  <label>Job posting URL
+    <input type="url" name="job_url" value="{{ form.get('job_url', '') }}" placeholder="https://…">
+    {% if errors.job_url %}<span class="field-error">{{ errors.job_url }}</span>{% endif %}
+  </label>
+
+  <label>Job description <span class="muted">(paste it to enable skill matching)</span>
+    <textarea name="job_description" rows="9">{{ form.get('job_description', '') }}</textarea>
+  </label>
+
+  <label>Notes
+    <textarea name="notes" rows="3">{{ form.get('notes', '') }}</textarea>
+  </label>
+
+  <div class="form-actions">
+    <button class="btn" type="submit">{{ 'Save changes' if editing else 'Add application' }}</button>
+    <a class="btn btn-secondary" href="{{ url_for('views.applications') }}">Cancel</a>
+  </div>
+</form>
+{% endblock %}

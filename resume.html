@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}Resume{% endblock %}
+{% block content %}
+<h1>Resume</h1>
+
+<section class="card">
+  <h2>Upload a PDF</h2>
+  <form method="post" enctype="multipart/form-data" class="inline-form">
+    <input type="file" name="resume" accept="application/pdf,.pdf" required>
+    <button class="btn" type="submit">Upload &amp; analyse</button>
+  </form>
+  <p class="muted">Text-based PDFs only, up to 5&nbsp;MB. Your latest upload is used for all matching. Files are not stored; only the extracted text and skills are saved in your local database.</p>
+</section>
+
+{% if resume %}
+<section class="card">
+  <h2>Skills found in <em>{{ resume.filename }}</em></h2>
+  <p class="muted">Uploaded {{ resume.uploaded_at }} · {{ resume.skills|length }} skills</p>
+  {% for category, skills in grouped.items() %}
+    <h3>{{ category }}</h3>
+    <div class="chips">{% for s in skills %}<span class="chip chip-good">{{ s }}</span>{% endfor %}</div>
+  {% else %}
+    <p class="muted">No known skills were detected in this resume.</p>
+  {% endfor %}
+</section>
+{% endif %}
+{% endblock %}

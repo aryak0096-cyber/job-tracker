@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+{% block title %}Dashboard{% endblock %}
+{% block content %}
+<h1>Dashboard</h1>
+
+<section class="stat-grid">
+  <div class="stat"><span class="stat-num">{{ stats.total }}</span><span class="stat-label">Total tracked</span></div>
+  <div class="stat"><span class="stat-num">{{ stats.submitted }}</span><span class="stat-label">Submitted</span></div>
+  <div class="stat"><span class="stat-num">{{ stats.response_rate }}%</span><span class="stat-label">Response rate</span></div>
+  <div class="stat"><span class="stat-num">{{ stats.interview_rate }}%</span><span class="stat-label">Interview / offer rate</span></div>
+</section>
+
+<div class="two-col">
+  <section class="card">
+    <h2>By status</h2>
+    {% if stats.total == 0 %}
+      <p class="muted">No applications yet. <a href="{{ url_for('views.new_application') }}">Add your first one.</a></p>
+    {% else %}
+      {% for status in statuses %}
+        {% set n = stats.by_status[status] %}
+        <div class="bar-row">
+          <a class="bar-label" href="{{ url_for('views.applications', status=status) }}">{{ status }}</a>
+          <div class="bar-track"><div class="bar bar-{{ status|lower }}" style="width: {{ (100 * n / stats.total)|round|int }}%"></div></div>
+          <span class="bar-count">{{ n }}</span>
+        </div>
+      {% endfor %}
+    {% endif %}
+  </section>
+
+  <section class="card">
+    <h2>Applications per month</h2>
+    {% if stats.monthly %}
+      {% set peak = stats.monthly|map(attribute='count')|max %}
+      {% for m in stats.monthly %}
+        <div class="bar-row">
+          <span class="bar-label">{{ m.month }}</span>
+          <div class="bar-track"><div class="bar bar-applied" style="width: {{ (100 * m.count / peak)|round|int }}%"></div></div>
+          <span class="bar-count">{{ m.count }}</span>
+        </div>
+      {% endfor %}
+    {% else %}
+      <p class="muted">Nothing to chart yet.</p>
+    {% endif %}
+  </section>
+</div>
+
+<section class="card">
+  <h2>Skills to work on</h2>
+  {% if not resume %}
+    <p class="muted">Upload your resume to see which skills job postings ask for that you don't list. <a href="{{ url_for('views.resume') }}">Upload resume</a></p>
+  {% elif top_missing %}
+    <p class="muted">Most common skills missing from your resume across your saved job descriptions:</p>
+    <div class="chips">
+      {% for skill, count in top_missing %}<span class="chip chip-bad">{{ skill }} · {{ count }}</span>{% endfor %}
+    </div>
+  {% else %}
+    <p class="muted">Add job descriptions to your applications and gaps will show up here.</p>
+  {% endif %}
+</section>
+
+<section class="card">
+  <h2>Recent applications</h2>
+  {% if recent %}
+    <table>
+      <thead><tr><th>Company</th><th>Role</th><th>Status</th><th>Applied</th></tr></thead>
+      <tbody>
+      {% for a in recent %}
+        <tr>
+          <td><a href="{{ url_for('views.application_detail', app_id=a.id) }}">{{ a.company }}</a></td>
+          <td>{{ a.role }}</td>
+          <td><span class="badge badge-{{ a.status|lower }}">{{ a.status }}</span></td>
+          <td>{{ a.applied_date }}</td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <p class="muted">Nothing here yet.</p>
+  {% endif %}
+</section>
+{% endblock %}

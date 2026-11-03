@@ -1,0 +1,39 @@
+{# Expects `analysis` (dict from analyzer.compare) #}
+<section class="card">
+  <h2>Resume match</h2>
+  {% if analysis.match_percent is none %}
+    <p class="muted">No recognisable skills were found in this job description.</p>
+  {% else %}
+    <div class="match-meter" role="img" aria-label="{{ analysis.match_percent }} percent match">
+      <div class="match-fill {% if analysis.match_percent >= 70 %}good{% elif analysis.match_percent >= 40 %}ok{% else %}low{% endif %}"
+           style="width: {{ analysis.match_percent }}%"></div>
+    </div>
+    <p class="match-label"><strong>{{ analysis.match_percent }}%</strong> of the skills in this posting appear on your resume</p>
+  {% endif %}
+
+  <div class="skill-columns">
+    <div>
+      <h3>Matched ({{ analysis.matched|length }})</h3>
+      <div class="chips">
+        {% for s in analysis.matched %}<span class="chip chip-good">{{ s }}</span>{% else %}<span class="muted">None</span>{% endfor %}
+      </div>
+    </div>
+    <div>
+      <h3>Missing ({{ analysis.missing|length }})</h3>
+      <div class="chips">
+        {% for s in analysis.missing %}<span class="chip chip-bad">{{ s }}</span>{% else %}<span class="muted">None</span>{% endfor %}
+      </div>
+    </div>
+    <div>
+      <h3>Extra on your resume ({{ analysis.extra|length }})</h3>
+      <div class="chips">
+        {% for s in analysis.extra %}<span class="chip">{{ s }}</span>{% else %}<span class="muted">None</span>{% endfor %}
+      </div>
+    </div>
+  </div>
+
+  <h3>Suggestions</h3>
+  <ul class="suggestions">
+    {% for tip in analysis.suggestions %}<li>{{ tip }}</li>{% endfor %}
+  </ul>
+</section>

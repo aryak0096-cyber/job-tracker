@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block title %}Applications{% endblock %}
+{% block content %}
+<div class="page-head">
+  <h1>Applications</h1>
+  <a class="btn" href="{{ url_for('views.new_application') }}">+ Add application</a>
+</div>
+
+<form class="filters" method="get">
+  <input type="search" name="q" value="{{ query }}" placeholder="Search company or role">
+  <select name="status">
+    <option value="">All statuses</option>
+    {% for s in statuses %}<option value="{{ s }}" {% if s == current_status %}selected{% endif %}>{{ s }}</option>{% endfor %}
+  </select>
+  <button class="btn btn-secondary" type="submit">Filter</button>
+</form>
+
+<section class="card">
+  {% if applications %}
+  <table>
+    <thead><tr><th>Company</th><th>Role</th><th>Status</th><th>Applied</th><th></th></tr></thead>
+    <tbody>
+    {% for a in applications %}
+      <tr>
+        <td><a href="{{ url_for('views.application_detail', app_id=a.id) }}">{{ a.company }}</a></td>
+        <td>{{ a.role }}</td>
+        <td>
+          <form method="post" action="{{ url_for('views.change_status', app_id=a.id) }}" class="inline">
+            <select name="status" class="status-select badge-{{ a.status|lower }}" data-autosubmit>
+              {% for s in statuses %}<option value="{{ s }}" {% if s == a.status %}selected{% endif %}>{{ s }}</option>{% endfor %}
+            </select>
+            <noscript><button type="submit">Save</button></noscript>
+          </form>
+        </td>
+        <td>{{ a.applied_date }}</td>
+        <td class="actions">
+          <a href="{{ url_for('views.edit_application', app_id=a.id) }}">Edit</a>
+          <form method="post" action="{{ url_for('views.delete_application', app_id=a.id) }}" class="inline" data-confirm="Delete {{ a.company }} – {{ a.role }}?">
+            <button class="link danger" type="submit">Delete</button>
+          </form>
+        </td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+    <p class="muted">No applications match. <a href="{{ url_for('views.new_application') }}">Add one.</a></p>
+  {% endif %}
+</section>
+{% endblock %}
